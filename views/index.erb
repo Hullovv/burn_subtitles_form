@@ -272,14 +272,11 @@
                         <h3 style="margin-bottom: 15px; color: #667eea;">⚙️ Настройки субтитров</h3>
                         <div class="row">
                             <div>
-                                <label>Шрифт</label>
                                 <select name="font" id="fontSelect">
-                                    <option value="Arial">Arial</option>
-                                    <option value="Verdana">Verdana</option>
-                                    <option value="Times New Roman">Times New Roman</option>
-                                    <option value="Impact">Impact</option>
-                                    <option value="Courier New">Courier New</option>
-                                    <option value="Georgia">Georgia</option>
+                                    <label>Шрифт</label>
+                                <% fonts.each do |font| %>
+                                    <option value=<%= font.name %>><%= font.name %></option>
+                                <% end %>
                                 </select>
                             </div>
                             <div>
@@ -409,6 +406,7 @@
                 subtitleText.style.webkitTextStroke = `${outlineWidth} rgba(0,0,0,0.8)`;
                 subtitleText.style.textStroke = `${outlineWidth} rgba(0,0,0,0.8)`;
             } else {
+            // console
                 subtitleText.style.webkitTextStroke = 'none';
                 subtitleText.style.textStroke = 'none';
             }

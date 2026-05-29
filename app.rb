@@ -5,6 +5,7 @@ require 'tempfile'
 require 'open3'
 require 'securerandom'
 require 'uri'
+require_relative 'fonts'
 
 # Настройки
 set :port, 4567
@@ -20,45 +21,43 @@ FileUtils.mkdir_p(OUTPUT_DIR)
 
 # Главная страница с формой
 get '/' do
-  erb :index
+  erb :index, locals: { fonts: Fonts.all }
 end
 
 def load_files(local_path, file_url)
   puts "📥 Скачивание видео: #{file_url}"
-  system("wget", "-q", "--timeout=60", "--tries=3", "-O", local_path, file_url)
+  system('wget', '-q', '--timeout=60', '--tries=3', '-O', local_path, file_url)
 
   unless File.exist?(local_path) && File.size(local_path) > 0
-    return erb :error, locals: { message: "Не удалось скачать видео. Проверьте URL и доступность файла." }
+    return erb :error, locals: { message: 'Не удалось скачать видео. Проверьте URL и доступность файла.' }
   end
 
   puts "✅ Видео скачано: #{File.size(local_path)} байт"
 end
 
-def subtitles_style(font_name, font_size, primary_colour, back_colour, outline, shadow)
+def subtitles_style(_font_name, font_size, primary_colour, _back_colour, _outline, _shadow)
   [
     "FontName=#{font}",
     "FontSize=#{font_size}",
     "PrimaryColour=#{primary_colour}",
-    "BorderStyle=1"
-  ].join(",")
+    'BorderStyle=1'
+  ].join(',')
 end
 
 # Обработка: видео по URL, субтитры из файла
 post '/burn' do
   video_url = params[:video_url]
 
-  if video_url.nil? || video_url.empty?
-    return erb :error, locals: { message: "Необходимо указать URL видео файла" }
-  end
+  return erb :error, locals: { message: 'Необходимо указать URL видео файла' } if video_url.nil? || video_url.empty?
 
   unless params[:subtitle_file] && params[:subtitle_file][:tempfile]
-    return erb :error, locals: { message: "Необходимо выбрать файл субтитров" }
+    return erb :error, locals: { message: 'Необходимо выбрать файл субтитров' }
   end
 
   subtitle_file = params[:subtitle_file][:tempfile]
   subtitle_filename = params[:subtitle_file][:filename]
 
-  font = params[:font] || 'Arial'
+  params[:font] || 'Arial'
   font_size = params[:font_size] || 20
   primary_colour = params[:primary_colour] || '&H00FFFFFF'
   outline = params[:outline] || 1
@@ -69,7 +68,7 @@ post '/burn' do
 
   begin
     video_ext = File.extname(URI.parse(video_url).path)
-  rescue => e
+  rescue StandardError => e
     return erb :error, locals: { message: "Некорректный URL видео: #{e.message}" }
   end
 
@@ -88,7 +87,7 @@ post '/burn' do
     puts "📝 Субтитры: #{subtitle_path} (#{File.size(subtitle_path)} байт)"
 
     escaped_subtitle = subtitle_path.gsub("'", "'\\\\''")
-    escaped_subtitle = escaped_subtitle.gsub(":", "\\:")
+    escaped_subtitle = escaped_subtitle.gsub(':', '\\:')
 
     style_params = subtitles_style(font_name, font_size, primary_colour, back_colour, outline, shadow)
     subtitles_filter = "subtitles='#{escaped_subtitle}':force_style='#{style_params}'"
@@ -108,18 +107,18 @@ post '/burn' do
       output_path
     ]
 
-    puts "🎬 Прожигаем субтитры..."
-    stdout, stderr, status = Open3.capture3(*ffmpeg_cmd)
+    puts '🎬 Прожигаем субтитры...'
+    _, stderr, status = Open3.capture3(*ffmpeg_cmd)
 
     if status.success? && File.exist?(output_path) && File.size(output_path) > 0
-      puts "✅ Готово!"
+      puts '✅ Готово!'
       download_url = "/download/#{job_id}"
       erb :success, locals: { download_url: download_url, job_id: job_id }
     else
-      error_msg = stderr[-500..-1] || "Неизвестная ошибка"
+      error_msg = stderr[-500..-1] || 'Неизвестная ошибка'
       erb :error, locals: { message: "Ошибка при обработке видео: #{error_msg}" }
     end
-  rescue => e
+  rescue StandardError => e
     erb :error, locals: { message: "Ошибка: #{e.message}" }
   ensure
     Thread.new do
@@ -144,30 +143,28 @@ get '/download/:job_id' do
       FileUtils.rm_f(output_file) if File.exist?(output_file)
     end
   else
-    erb :error, locals: { message: "Файл не найден или уже удален" }
+    erb :error, locals: { message: 'Файл не найден или уже удален' }
   end
 end
 
 Thread.new do
-  while true do
+  while true
     sleep 1800
     [DOWNLOAD_DIR, OUTPUT_DIR].each do |dir|
       Dir.glob(File.join(dir, '*')).each do |file|
-        if File.exist?(file) && File.mtime(file) < Time.now - 7200
-          FileUtils.rm_f(file)
-        end
+        FileUtils.rm_f(file) if File.exist?(file) && File.mtime(file) < Time.now - 7200
       end
     end
   end
 end
 
 if __FILE__ == $0
-  puts "=" * 60
-  puts "🎬 Видео Сервис - Прожиг субтитров с предпросмотром"
-  puts "=" * 60
-  puts "🚀 Сервер запущен на http://0.0.0.0:4567"
-  puts "Нажмите Ctrl+C для остановки"
-  puts ""
+  puts '=' * 60
+  puts '🎬 Видео Сервис - Прожиг субтитров с предпросмотром'
+  puts '=' * 60
+  puts '🚀 Сервер запущен на http://0.0.0.0:4567'
+  puts 'Нажмите Ctrl+C для остановки'
+  puts ''
 
   Sinatra::Application.run!
 end
