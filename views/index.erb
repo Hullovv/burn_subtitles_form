@@ -4,364 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Видео Сервис - Прожиг субтитров с предпросмотром</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-        .header h1 { font-size: 2em; margin-bottom: 10px; }
-        .header p { opacity: 0.9; }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-        }
-
-        .form-container {
-            padding: 30px;
-            border-right: 1px solid #e0e0e0;
-        }
-
-        .preview-container {
-            padding: 30px;
-            background: #f8f9fa;
-        }
-
-        .preview-box {
-            border-radius: 15px;
-            padding: 20px;
-            min-height: 450px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: background 0.3s ease;
-        }
-
-        .preview-subtitle {
-            background: rgba(0,0,0,0.6);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s ease;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .preview-label {
-            color: white;
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .background-controls {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 10px;
-        }
-
-        .background-controls label {
-            font-size: 13px;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .bg-options {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .bg-option {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 12px;
-            transition: all 0.2s;
-            background: white;
-        }
-
-        .bg-option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        .bg-option.selected {
-            border-color: #667eea;
-            background: #f0f0ff;
-        }
-
-        .bg-preview {
-            width: 100%;
-            height: 40px;
-            border-radius: 5px;
-            margin-bottom: 5px;
-        }
-
-        .sample-texts {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .sample-btn {
-            padding: 8px;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .sample-btn:hover {
-            background: rgba(0,0,0,0.9);
-            transform: translateY(-1px);
-        }
-
-        .form-group { margin-bottom: 20px; }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-        input[type="url"], input[type="text"], input[type="number"], select, input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        input[type="range"] {
-            width: 100%;
-            padding: 0;
-            cursor: pointer;
-        }
-        .settings-panel {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        button:hover { transform: translateY(-2px); }
-        .help-text {
-            font-size: 11px;
-            color: #888;
-            margin-top: 5px;
-        }
-        .loader {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            color: white;
-            padding: 30px 50px;
-            border-radius: 15px;
-            z-index: 1000;
-            text-align: center;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            .form-container {
-                border-right: none;
-                border-bottom: 1px solid #e0e0e0;
-            }
-            .bg-options {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎬 Прожиг субтитров в видео</h1>
-            <p>Предпросмотр всех эффектов с возможностью смены фона</p>
-        </div>
-
-        <div class="main-content">
-            <!-- Левая колонка - форма -->
-            <div class="form-container">
-                <form action="/burn" method="post" enctype="multipart/form-data" id="burnForm">
-                    <div class="form-group">
-                        <label>📹 URL видео файла</label>
-                        <input type="url" name="video_url"
-                               placeholder="https://example.com/video.mp4"
-                               required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>📝 Файл субтитров</label>
-                        <input type="file" name="subtitle_file"
-                               accept=".srt,.vtt,.ass,.ssa,.txt"
-                               id="subtitleFile">
-                        <div class="help-text">Загрузите файл для отображения в предпросмотре</div>
-                    </div>
-
-                    <div class="settings-panel">
-                        <h3 style="margin-bottom: 15px; color: #667eea;">⚙️ Настройки субтитров</h3>
-                        <div class="row">
-                            <div>
-                                <select name="font" id="fontSelect">
-                                    <label>Шрифт</label>
-                                <% fonts.each do |font| %>
-                                    <option value=<%= font.name %>><%= font.name %></option>
-                                <% end %>
-                                </select>
-                            </div>
-                            <div>
-                                <label>Размер</label>
-                                <input type="number" name="font_size" id="fontSize" value="24" min="10" max="60" step="2">
-                            </div>
-                            <div>
-                                <label>Цвет текста</label>
-                                <select name="primary_colour" id="textColor">
-                                    <option value="&H00FFFFFF">⚪ Белый</option>
-                                    <option value="&H0000FFFF">🟡 Желтый</option>
-                                    <option value="&H00FF0000">🔴 Красный</option>
-                                    <option value="&H0000FF00">🟢 Зеленый</option>
-                                    <option value="&H000000FF">🔵 Синий</option>
-                                    <option value="&H00FF00FF">🟣 Фиолетовый</option>
-                                    <option value="&H0000FFFF">🟠 Оранжевый</option>
-                                    <option value="&H00FFFFFF">⚪ Светло-голубой</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>Контур (0-5)</label>
-                                <input type="range" id="outline" name="outline" min="0" max="5" value="1" step="1">
-                                <div class="help-text">Значение: <span id="outlineValue">1</span></div>
-                            </div>
-                            <div>
-                                <label>🌑 Тень (0-6)</label>
-                                <input type="range" id="shadow" name="shadow" min="0" max="6" value="2" step="1">
-                                <div class="help-text">Значение: <span id="shadowValue">2</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" id="submitBtn">
-                        🔥 Прожечь субтитры
-                    </button>
-                </form>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>🎬 Прожиг субтитров в видео</h1>
+                <p>Предпросмотр всех эффектов с поиском шрифтов</p>
             </div>
 
-            <!-- Правая колонка - предпросмотр -->
-            <div class="preview-container">
-                <div class="preview-box" id="previewBox">
-                    <div class="preview-label">
-                        🎨 Предпросмотр субтитров (применены все эффекты)
-                    </div>
-                    <div id="previewSubtitle" class="preview-subtitle">
-                        <div id="subtitleText" style="transition: all 0.2s;">
-                            Загрузите файл субтитров<br>
-                            или выберите пример ниже
-                        </div>
-                    </div>
-
-                    <!-- Выбор фона -->
-                    <div class="background-controls">
-                        <label>🎨 Выбор фона для предпросмотра:</label>
-                        <div class="bg-options">
-                            <div class="bg-option" data-bg="black" onclick="setBackground('black')">
-                                <div class="bg-preview" style="background: #000;"></div>
-                                <div>Черный</div>
-                            </div>
-                            <div class="bg-option" data-bg="white" onclick="setBackground('white')">
-                                <div class="bg-preview" style="background: #fff; border: 1px solid #ddd;"></div>
-                                <div>Белый</div>
-                            </div>
-                            <div class="bg-option" data-bg="gradient" onclick="setBackground('gradient')">
-                                <div class="bg-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-                                <div>Градиент</div>
-                            </div>
-                            <div class="bg-option" data-bg="video" onclick="setBackground('video')">
-                                <div class="bg-preview" style="background: #4a4a4a; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🎬</div>
-                                <div>Видео</div>
-                            </div>
+            <div class="main-content">
+                <!-- Левая колонка - форма -->
+                <div class="form-container">
+                    <form action="/burn" method="post" enctype="multipart/form-data" id="burnForm">
+                        <div class="form-group">
+                            <label>📹 URL видео файла</label>
+                            <input type="url" name="video_url"
+                                placeholder="https://example.com/video.mp4"
+                                required>
                         </div>
 
-                        <!-- Скрытый блок для видео фона -->
-                        <div id="videoBackground" style="display: none; margin-top: 10px;">
-                            <input type="url" id="bgVideoUrl" placeholder="https://example.com/video.mp4" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                            <button type="button" onclick="loadVideoBackground()" style="margin-top: 5px; padding: 5px; font-size: 12px;">Загрузить видео фон</button>
+                        <div class="form-group">
+                            <label>📝 Файл субтитров</label>
+                            <input type="file" name="subtitle_file"
+                                accept=".srt,.vtt,.ass,.ssa,.txt"
+                                id="subtitleFile">
+                            <div class="help-text">Загрузите файл для отображения в предпросмотре</div>
                         </div>
-                    </div>
 
-                    <div class="sample-texts">
-                        <div class="sample-btn" onclick="setSampleText('Это пример субтитров с тенью и контуром')">📝 Пример 1</div>
-                        <div class="sample-btn" onclick="setSampleText('Настройки применяются в реальном времени')">⚡ Пример 2</div>
-                        <div class="sample-btn" onclick="setSampleText('Шрифт: ' + document.getElementById('fontSelect').value)">🎨 Пример 3</div>
-                        <div class="sample-btn" onclick="loadFirstSubtitle()">📄 Показать из файла</div>
+                        <div class="settings-panel">
+                            <h3 style="margin-bottom: 15px; color: #667eea;">⚙️ Настройки субтитров</h3>
+                            <div class="row">
+                                <div>
+                                    <label>🔍 Поиск шрифта</label>
+                                    <div class="font-search-container">
+                                        <input type="text" id="fontSearch" class="font-search-input"
+                                            placeholder="Введите название шрифта..." autocomplete="off">
+                                        <div id="fontList" class="font-select-custom"></div>
+                                    </div>
+                                    <input type="hidden" name="font" id="selectedFont" value="Arial">
+                                    <div class="selected-font-display" id="selectedFontDisplay">
+                                        Выбран: <strong>Arial</strong>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label>Размер</label>
+                                    <input type="number" name="font_size" id="fontSize" value="24" min="10" max="60" step="2">
+                                </div>
+                                <div>
+                                    <label>Цвет текста</label>
+                                    <select name="primary_colour" id="textColor">
+                                        <option value="&H00FFFFFF">⚪ Белый</option>
+                                        <option value="&H0000FFFF">🟡 Желтый</option>
+                                        <option value="&H00FF0000">🔴 Красный</option>
+                                        <option value="&H0000FF00">🟢 Зеленый</option>
+                                        <option value="&H000000FF">🔵 Синий</option>
+                                        <option value="&H00FF00FF">🟣 Фиолетовый</option>
+                                        <option value="&H0000FFFF">🟠 Оранжевый</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>📝 Контур (0-5)</label>
+                                    <input type="range" id="outline" name="outline" min="0" max="5" value="1" step="1">
+                                    <div class="help-text">Значение: <span id="outlineValue">1</span> <span id="outlineStatus"></span></div>
+                                </div>
+                                <div>
+                                    <label>🌑 Тень (0-6)</label>
+                                    <input type="range" id="shadow" name="shadow" min="0" max="6" value="2" step="1">
+                                    <div class="help-text">Значение: <span id="shadowValue">2</span> <span id="shadowStatus"></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn">
+                            🔥 Прожечь субтитры
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Правая колонка - предпросмотр -->
+                <div class="preview-container">
+                    <div class="preview-box" id="previewBox">
+                        <div class="preview-label">
+                            🎨 Предпросмотр субтитров (применены все эффекты)
+                        </div>
+                        <div id="previewSubtitle" class="preview-subtitle">
+                            <div id="subtitleText" style="transition: all 0.2s;">
+                                Загрузите файл субтитров<br>
+                                или выберите пример ниже
+                            </div>
+                        </div>
+
+                        <!-- Выбор фона -->
+                        <div class="background-controls">
+                            <label>🎨 Выбор фона для предпросмотра:</label>
+                            <div class="bg-options">
+                                <div class="bg-option" data-bg="black" onclick="setBackground('black')">
+                                    <div class="bg-preview" style="background: #000;"></div>
+                                    <div>Черный</div>
+                                </div>
+                                <div class="bg-option" data-bg="white" onclick="setBackground('white')">
+                                    <div class="bg-preview" style="background: #fff; border: 1px solid #ddd;"></div>
+                                    <div>Белый</div>
+                                </div>
+                                <div class="bg-option" data-bg="gradient" onclick="setBackground('gradient')">
+                                    <div class="bg-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                                    <div>Градиент</div>
+                                </div>
+                                <div class="bg-option" data-bg="video" onclick="setBackground('video')">
+                                    <div class="bg-preview" style="background: #4a4a4a; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🎬</div>
+                                    <div>Видео</div>
+                                </div>
+                            </div>
+
+                            <!-- Скрытый блок для видео фона -->
+                            <div id="videoBackground" style="display: none; margin-top: 10px;">
+                                <input type="url" id="bgVideoUrl" placeholder="https://example.com/video.mp4" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                                <button type="button" onclick="loadVideoBackground()" style="margin-top: 5px; padding: 5px; font-size: 12px;">Загрузить видео фон</button>
+                            </div>
+                        </div>
+
+                        <div class="sample-texts">
+                            <div class="sample-btn" onclick="setSampleText('Это пример субтитров с тенью и контуром')">📝 Пример 1</div>
+                            <div class="sample-btn" onclick="setSampleText('Настройки применяются в реальном времени')">⚡ Пример 2</div>
+                            <div class="sample-btn" onclick="setSampleText('Шрифт: ' + document.getElementById('selectedFont').value)">🎨 Пример 3</div>
+                            <div class="sample-btn" onclick="loadFirstSubtitle()">📄 Показать из файла</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -374,234 +143,6 @@
         <div>Пожалуйста, не закрывайте страницу</div>
     </div>
 
-    <script>
-        // DOM элементы
-        const fontSelect = document.getElementById('fontSelect');
-        const fontSize = document.getElementById('fontSize');
-        const textColor = document.getElementById('textColor');
-        const outline = document.getElementById('outline');
-        const outlineValue = document.getElementById('outlineValue');
-        const shadow = document.getElementById('shadow');
-        const shadowValue = document.getElementById('shadowValue');
-        const subtitleText = document.getElementById('subtitleText');
-        const subtitleFile = document.getElementById('subtitleFile');
-        const previewBox = document.getElementById('previewBox');
-
-        let currentText = "Загрузите файл субтитров\nили выберите пример ниже";
-        let currentBg = 'black';
-        let videoElement = null;
-
-        // Функция обновления предпросмотра с ВСЕМИ эффектами
-        function updatePreview() {
-            const font = fontSelect.value;
-            const size = fontSize.value + 'px';
-            const color = getColorValue(textColor.value);
-            const outlineWidth = outline.value + 'px';
-
-            // Создаем эффекты
-            let textShadow = '';
-
-            // Эффект контура
-            if (outline.value > 0) {
-                subtitleText.style.webkitTextStroke = `${outlineWidth} rgba(0,0,0,0.8)`;
-                subtitleText.style.textStroke = `${outlineWidth} rgba(0,0,0,0.8)`;
-            } else {
-            // console
-                subtitleText.style.webkitTextStroke = 'none';
-                subtitleText.style.textStroke = 'none';
-            }
-
-            // Эффект тени
-            const shadowSize = shadow.value;
-            if (shadowSize > 0) {
-                const shadowOffset = shadowSize * 1.5;
-                const shadowBlur = shadowSize;
-                textShadow = `${shadowOffset}px ${shadowOffset}px ${shadowBlur}px rgba(0,0,0,0.8)`;
-            }
-
-            // Применяем все стили
-            subtitleText.style.fontFamily = font;
-            subtitleText.style.fontSize = size;
-            subtitleText.style.color = color;
-            subtitleText.style.textShadow = textShadow;
-            subtitleText.style.fontWeight = 'bold';
-            subtitleText.style.letterSpacing = '0.5px';
-            subtitleText.style.lineHeight = '1.5';
-        }
-
-        // Конвертация цвета FFmpeg в CSS цвет
-        function getColorValue(ffmpegColor) {
-            const colorMap = {
-                '&H00FFFFFF': '#FFFFFF',
-                '&H0000FFFF': '#FFFF00',
-                '&H00FF0000': '#FF0000',
-                '&H0000FF00': '#00FF00',
-                '&H000000FF': '#0000FF',
-                '&H00FF00FF': '#FF00FF',
-                '&H0000FFFF': '#FFA500'
-            };
-            return colorMap[ffmpegColor] || '#FFFFFF';
-        }
-
-        // Установка фона
-        function setBackground(type) {
-            currentBg = type;
-
-            // Обновляем выделение кнопок
-            document.querySelectorAll('.bg-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            document.querySelector(`.bg-option[data-bg="${type}"]`).classList.add('selected');
-
-            // Удаляем видео элемент если есть
-            if (videoElement) {
-                videoElement.pause();
-                videoElement.remove();
-                videoElement = null;
-            }
-
-            // Скрываем блок видео
-            document.getElementById('videoBackground').style.display = 'none';
-
-            // Применяем фон
-            switch(type) {
-                case 'black':
-                    previewBox.style.background = '#000000';
-                    previewBox.style.backgroundImage = 'none';
-                    break;
-                case 'white':
-                    previewBox.style.background = '#ffffff';
-                    previewBox.style.backgroundImage = 'none';
-                    // Для белого фона меняем цвет текста предпросмотра
-                    document.querySelector('.preview-label').style.color = '#333';
-                    break;
-                case 'gradient':
-                    previewBox.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    previewBox.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    document.querySelector('.preview-label').style.color = 'white';
-                    break;
-                case 'video':
-                    document.getElementById('videoBackground').style.display = 'block';
-                    previewBox.style.background = '#2a2a2a';
-                    document.querySelector('.preview-label').style.color = 'white';
-                    break;
-            }
-
-            // Обновляем прозрачность фона субтитров в зависимости от цвета фона
-            const previewSubtitle = document.querySelector('.preview-subtitle');
-            if (type === 'white') {
-                previewSubtitle.style.backgroundColor = 'rgba(0,0,0,0.1)';
-                previewSubtitle.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-            } else {
-                previewSubtitle.style.backgroundColor = 'rgba(0,0,0,0.6)';
-                previewSubtitle.style.boxShadow = 'none';
-            }
-        }
-
-        // Загрузка видео фона
-        function loadVideoBackground() {
-            const videoUrl = document.getElementById('bgVideoUrl').value;
-            if (!videoUrl) {
-                alert('Введите URL видео для фона');
-                return;
-            }
-
-            // Удаляем старый видео элемент
-            if (videoElement) {
-                videoElement.pause();
-                videoElement.remove();
-            }
-
-            // Создаем новый видео элемент
-            videoElement = document.createElement('video');
-            videoElement.src = videoUrl;
-            videoElement.autoplay = true;
-            videoElement.loop = true;
-            videoElement.muted = true;
-            videoElement.style.position = 'absolute';
-            videoElement.style.top = '0';
-            videoElement.style.left = '0';
-            videoElement.style.width = '100%';
-            videoElement.style.height = '100%';
-            videoElement.style.objectFit = 'cover';
-            videoElement.style.borderRadius = '15px';
-
-            previewBox.style.position = 'relative';
-            previewBox.style.overflow = 'hidden';
-            previewBox.insertBefore(videoElement, previewBox.firstChild);
-
-            videoElement.play().catch(e => console.log('Auto-play prevented:', e));
-        }
-
-        // Обновление значений слайдеров
-        outline.addEventListener('input', function() {
-            outlineValue.textContent = this.value;
-            updatePreview();
-        });
-
-        shadow.addEventListener('input', function() {
-            shadowValue.textContent = this.value;
-            updatePreview();
-        });
-
-        fontSelect.addEventListener('change', updatePreview);
-        fontSize.addEventListener('input', updatePreview);
-        textColor.addEventListener('change', updatePreview);
-
-        // Установка примера текста
-        function setSampleText(text) {
-            currentText = text;
-            subtitleText.innerHTML = text.replace(/\n/g, '<br>');
-            updatePreview();
-        }
-
-        // Загрузка первого субтитра из файла
-        function loadFirstSubtitle() {
-            if (subtitleFile.files && subtitleFile.files[0]) {
-                const file = subtitleFile.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    const lines = content.split('\n');
-                    // Парсинг SRT (ищем текстовую строку)
-                    let textLines = [];
-                    for (let i = 0; i < lines.length; i++) {
-                        const line = lines[i].trim();
-                        if (line && !line.match(/^\d+$/) && !line.match(/^\d{2}:\d{2}:\d{2}/) && !line.includes('-->')) {
-                            textLines.push(line);
-                            if (textLines.length >= 3) break;
-                        }
-                    }
-                    const subtitleContent = textLines.join('<br>') || 'Субтитры загружены';
-                    setSampleText(subtitleContent);
-                };
-                reader.readAsText(file, 'UTF-8');
-            } else {
-                alert('Пожалуйста, сначала выберите файл субтитров');
-            }
-        }
-
-        // Обработка формы
-        const form = document.getElementById('burnForm');
-        const loader = document.getElementById('loader');
-        const submitBtn = document.getElementById('submitBtn');
-
-        form.addEventListener('submit', function(e) {
-            const videoUrl = document.querySelector('input[name="video_url"]').value;
-            if (!videoUrl.startsWith('http://') && !videoUrl.startsWith('https://')) {
-                e.preventDefault();
-                alert('Пожалуйста, введите корректный URL видео');
-                return;
-            }
-
-            loader.style.display = 'block';
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Обработка...';
-        });
-
-        // Инициализация
-        updatePreview();
-        setBackground('black');
-    </script>
+    <script src="/js/script.js"></script>
 </body>
 </html>
